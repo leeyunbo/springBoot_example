@@ -1,8 +1,12 @@
 package hello.core.member;
 
-import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+
+/*
+ * MemoryMemberRepository
+ * MemberRepository의 구현체
+ */
 
 public class MemoryMemberRepository implements MemberRepository {
 
