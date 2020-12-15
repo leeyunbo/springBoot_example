@@ -25,3 +25,24 @@ public class OrderServiceImpl implements OrderService{
 
 ##### Q. 해결 방법은?
 ##### A. `OrderServiceImpl`이 DIP를 지키기 위해서는 인터페이스(추상화)에만 의존해야 한다. 따라서 구현 객체를 생성하고 주입시켜줄 수 있는 제 3자가 필요하다.
+
+<br/>
+
+### 두번째 문제(관심사 분리) 
+```java
+public class AppConfig {
+
+    public MemberService memberService() {
+        return new MemberServiceImpl(new MemoryMemberRepository());
+    }
+
+    public OrderService orderService() {
+        return new OrderServiceImpl(new MemoryMemberRepository(), new FixDiscountPolicy());
+    }
+}
+```
+1. 위의 예시에서 OCP, DIP를 지키기 위해서는 구현 객체를 생성하고 주입시켜주는 관심사만 가지고 있는 제 3자가 필요하다고 했다. 
+2. 따라서 구현 객체를 생성하고 생성자를 통해 주입시켜주는 관심사에만 관심이 있는 `AppConfig`를 구현하였다. 
+3. `AppConfig`덕분에 `OrderServiceImpl`은 단순히 주문 정보만 얻어오는 관심사만 가질 수 있게 되었다. 
+4. `OrderServiceImpl`은 `OrderService` 인터페이스에만 의존하며, 할인 정책이 변경되어도 코드 변경이 이루어지지 않으므로 DIP와 OCP를 만족한다고 할 수 있다. 
+
