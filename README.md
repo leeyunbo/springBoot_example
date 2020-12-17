@@ -86,7 +86,7 @@ public DiscountPolicy discountPolicy() {
     return new RateDiscountPolicy();
 }
 ```
-1. 첫번째 문제에서 할인 정책이 변경되면 `OrderServiceImpl`이 변경되어야 하기에 OCP를 만족하지 않는다고 했었다. 
+1. [첫번째 문제](https://github.com/leeyunbo/B2CBackend#%EC%B2%AB%EB%B2%88%EC%A7%B8-%EB%AC%B8%EC%A0%9C%EC%88%9C%EC%88%98-java%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EA%B5%AC%ED%98%84)에서 할인 정책이 변경되면 `OrderServiceImpl`이 변경되어야 하기에 OCP를 만족하지 않는다고 했었다. 
 2. 또한 `OrderServiceImpl`이 구현 객체에 의존하기에 DIP도 만족하지 않는다고 하였다.
 3. 따라서 객체를 생성하고 의존성을 주입해주는 `AppConfig`를 구현하였다.
 4. 만약 현 상황에서 할인 정책이 변경되면 단순히 `AppConfig`의 `discountPolicy()` 메서드만 변경함으로써 기능을 변경할 수 있다.
