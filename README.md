@@ -72,7 +72,27 @@ public class AppConfig {
 }
 ```
 
-1. 원래는  OrderService가 discountPolicy를 생성하고, MemberService가 MemberRepositry를 생성하는 등 역할이 겹쳐져 있었다.
+1. 원래는 `OrderService`가 `DiscountPolicy`를 생성하고, `MemberService`가 `MemberRepositry`를 생성하는 등 역할이 겹쳐져 있었다.
 2. 그렇기에 코드의 중복이 생기고 전체가 어떻게 구성되어 있는지 파악하기 어려웠으며, 변경하기에 굉장히 복잡하였다.
 3. 하지만 각각 역할을 명확하게 나타나도록 구현함으로써 문제를 해결할 수 있었다.
 4. 예시와 같이 역할을 명확하게 나타나도록 구현하게 되면 전체적인 구성이 눈에 쉽게 들어오며, 변경이 용이하고, 중복이 일어나지 않게 된다.
+
+<br/>
+
+### 네번째 문제(AppConfig 할인 정책 변경)
+```java
+public DiscountPolicy discountPolicy() {
+        // return new FixDiscountPolicy();
+    return new RateDiscountPolicy();
+}
+```
+1. 첫번째 문제에서 할인 정책이 변경되면 `OrderServiceImpl`이 변경되어야 하기에 OCP를 만족하지 않는다고 했었다. 
+2. 또한 `OrderServiceImpl`이 구현 객체에 의존하기에 DIP도 만족하지 않는다고 하였다.
+3. 따라서 객체를 생성하고 의존성을 주입해주는 `AppConfig`를 구현하였다.
+4. 만약 현 상황에서 할인 정책이 변경되면 단순히 `AppConfig`의 `discountPolicy()` 메서드만 변경함으로써 기능을 변경할 수 있다.
+
+#### 구성 영역과 사용 영역
+![스크린샷 2020-12-17 오후 9 59 56](https://user-images.githubusercontent.com/44944031/102491261-45d76600-40b3-11eb-8469-818e49848c2f.png)
+1. 다음과 같이 `AppConfig` 구성 영역만 영향을 받고, 사용 영역은 전혀 영향을 받지 않는다.
+2. 물론 `구성 영역`은 당연히 변경된다. `AppConfig`는 공연의 기획자로서 공연 참여자인 구현 객체들을 모두 알아야 한다.
+3. 따라서 코드의 변경이 이루어지지 않고, 각각 구성 요소들이 인터페이스에만 의존하므로 OCP와 DIP 모두를 만족한다.
