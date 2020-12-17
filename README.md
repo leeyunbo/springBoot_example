@@ -47,3 +47,32 @@ public class AppConfig {
 3. `AppConfig`덕분에 `OrderServiceImpl`은 단순히 주문 정보만 얻어오는 관심사만 가질 수 있게 되었다. 
 4. `OrderServiceImpl`은 `OrderService` 인터페이스에만 의존하기 때문에 DIP를 만족한다고 할 수 있다. 
 
+<br/>
+
+### 세번째 문제(AppConfig 리팩토링)
+```java
+public class AppConfig {
+    
+    // MemberService를 생성하는 역할
+    public MemberService memberService() {
+        return new MemberServiceImpl(memberRepository());
+    }
+    // MemberRepository를 생성하는 역할
+    private MemberRepository memberRepository() {
+        return new MemoryMemberRepository();
+    }
+    // OrderService를 생성하는 역할
+    public OrderService orderService() {
+        return new OrderServiceImpl(memberRepository(), discountPolicy());
+    }
+    // DiscountPolicy를 생성하는 역할
+    public DiscountPolicy discountPolicy() {
+        return new FixDiscountPolicy();
+    }
+}
+```
+
+1. 원래는  OrderService가 discountPolicy를 생성하고, MemberService가 MemberRepositry를 생성하는 등 역할이 겹쳐져 있었다.
+2. 그렇기에 코드의 중복이 생기고 전체가 어떻게 구성되어 있는지 파악하기 어려웠으며, 변경하기에 굉장히 복잡하였다.
+3. 하지만 각각 역할을 명확하게 나타나도록 구현함으로써 문제를 해결할 수 있었다.
+4. 예시와 같이 역할을 명확하게 나타나도록 구현하게 되면 전체적인 구성이 눈에 쉽게 들어오며, 변경이 용이하고, 중복이 일어나지 않게 된다.
