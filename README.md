@@ -1,5 +1,4 @@
-# B2CBackend
-Java를 활용한 B2CBackend 개발
+# B2C 백엔드 개발 
 
 ### 첫번째 문제(순수 JAVA를 이용한 구현) 
 ```java
