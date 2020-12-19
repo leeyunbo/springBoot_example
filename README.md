@@ -1,5 +1,4 @@
-# B2CBackend
-Java를 활용한 B2CBackend 개발
+# B2C 백엔드 개발 
 
 ### 첫번째 문제(순수 JAVA를 이용한 구현) 
 ```java
@@ -20,11 +19,11 @@ public class OrderServiceImpl implements OrderService{
     }
 }
 ```
-##### Q. `RateDiscountPolicy`(정액 할인법)과 `FixDiscountPolicy`(정률 할인법)을 구현한 후, 필요할때 마다 변경할 수 있도록 역할과 구현을 확실하게 분리하여 설계를 진행하였다. 그렇다면 OCP와 DIP를 지키게 된걸까? 
-##### A. `OrderServiceImpl`에서 코드의 변경이 이루어질 뿐만 아니라(OCP 위반), `OrderServiceImpl`이 인터페이스인 `DiscountPolicy`, 구현 객체인 `RateDiscountPolicy`에 동시에 의존(DIP 위반)한다. 따라서 OCP, DIP를 지킨다고 할 수 없다.
+Q. `RateDiscountPolicy`(정액 할인법)과 `FixDiscountPolicy`(정률 할인법)을 구현한 후, 필요할때 마다 변경할 수 있도록 역할과 구현을 확실하게 분리하여 설계를 진행하였다. 그렇다면 OCP와 DIP를 지키게 된걸까? <br/>
+A. `OrderServiceImpl`에서 코드의 변경이 이루어질 뿐만 아니라(OCP 위반), `OrderServiceImpl`이 인터페이스인 `DiscountPolicy`, 구현 객체인 `RateDiscountPolicy`에 동시에 의존(DIP 위반)한다. 따라서 OCP, DIP를 지킨다고 할 수 없다.
 
-##### Q. 해결 방법은?
-##### A. `OrderServiceImpl`이 DIP를 지키기 위해서는 인터페이스(추상화)에만 의존해야 한다. 따라서 구현 객체를 생성하고 주입시켜줄 수 있는 제 3자가 필요하다.
+Q. 해결 방법은? <br/>
+A. `OrderServiceImpl`이 DIP를 지키기 위해서는 인터페이스(추상화)에만 의존해야 한다. 따라서 구현 객체를 생성하고 주입시켜줄 수 있는 제 3자가 필요하다.
 
 <br/>
 
@@ -47,3 +46,57 @@ public class AppConfig {
 3. `AppConfig`덕분에 `OrderServiceImpl`은 단순히 주문 정보만 얻어오는 관심사만 가질 수 있게 되었다. 
 4. `OrderServiceImpl`은 `OrderService` 인터페이스에만 의존하기 때문에 DIP를 만족한다고 할 수 있다. 
 
+#### SRP도 만족할까?
+1. AppConfig로 분리하기 전에 테스트에 활용했던 OrderApp 클라이언트나 MemberApp 클라이언트는 객체를 생성, 실행하는 다양한 책임을 가지고 있었다.
+2. 하지만 AppConfig로 분리하게 되면서, AppConfig 객체 생성의 책임을 담당하고 클라이언트들이 객체 실행의 책임만을 담당하게 되었다.
+3. 따라서 AppConfig로 분리하게 되면서, SRP도 만족하게 되었음을 의미한다.
+
+<br/>
+
+### 세번째 문제(AppConfig 리팩토링)
+```java
+public class AppConfig {
+    
+    // MemberService를 생성하는 역할
+    public MemberService memberService() {
+        return new MemberServiceImpl(memberRepository());
+    }
+    // MemberRepository를 생성하는 역할
+    private MemberRepository memberRepository() {
+        return new MemoryMemberRepository();
+    }
+    // OrderService를 생성하는 역할
+    public OrderService orderService() {
+        return new OrderServiceImpl(memberRepository(), discountPolicy());
+    }
+    // DiscountPolicy를 생성하는 역할
+    public DiscountPolicy discountPolicy() {
+        return new FixDiscountPolicy();
+    }
+}
+```
+
+1. 원래는 `OrderService`가 `DiscountPolicy`를 생성하고, `MemberService`가 `MemberRepositry`를 생성하는 등 역할이 겹쳐져 있었다.
+2. 그렇기에 코드의 중복이 생기고 전체가 어떻게 구성되어 있는지 파악하기 어려웠으며, 변경하기에 굉장히 복잡하였다.
+3. 하지만 각각 역할을 명확하게 나타나도록 구현함으로써 문제를 해결할 수 있었다.
+4. 예시와 같이 역할을 명확하게 나타나도록 구현하게 되면 전체적인 구성이 눈에 쉽게 들어오며, 변경이 용이하고, 중복이 일어나지 않게 된다.
+
+<br/>
+
+### 네번째 문제(AppConfig 할인 정책 변경)
+```java
+public DiscountPolicy discountPolicy() {
+        // return new FixDiscountPolicy();
+    return new RateDiscountPolicy();
+}
+```
+1. [첫번째 문제](https://github.com/leeyunbo/B2CBackend#%EC%B2%AB%EB%B2%88%EC%A7%B8-%EB%AC%B8%EC%A0%9C%EC%88%9C%EC%88%98-java%EB%A5%BC-%EC%9D%B4%EC%9A%A9%ED%95%9C-%EA%B5%AC%ED%98%84)에서 할인 정책이 변경되면 `OrderServiceImpl`이 변경되어야 하기에 OCP를 만족하지 않는다고 했었다. 
+2. 또한 `OrderServiceImpl`이 구현 객체에 의존하기에 DIP도 만족하지 않는다고 하였다.
+3. 따라서 객체를 생성하고 의존성을 주입해주는 `AppConfig`를 구현하였다.
+4. 만약 현 상황에서 할인 정책이 변경되면 단순히 `AppConfig`의 `discountPolicy()` 메서드만 변경함으로써 기능을 변경할 수 있다.
+
+#### 구성 영역과 사용 영역
+![스크린샷 2020-12-17 오후 9 59 56](https://user-images.githubusercontent.com/44944031/102491261-45d76600-40b3-11eb-8469-818e49848c2f.png)
+1. 다음과 같이 `AppConfig` 구성 영역만 영향을 받고, 사용 영역은 전혀 영향을 받지 않는다.
+2. 물론 `구성 영역`은 당연히 변경된다. `AppConfig`는 공연의 기획자로서 공연 참여자인 구현 객체들을 모두 알아야 한다.
+3. 따라서 코드의 변경이 이루어지지 않고, 각각 구성 요소들이 인터페이스에만 의존하므로 OCP와 DIP 모두를 만족한다.
