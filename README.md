@@ -100,3 +100,64 @@ public DiscountPolicy discountPolicy() {
 1. 다음과 같이 `AppConfig` 구성 영역만 영향을 받고, 사용 영역은 전혀 영향을 받지 않는다.
 2. 물론 `구성 영역`은 당연히 변경된다. `AppConfig`는 공연의 기획자로서 공연 참여자인 구현 객체들을 모두 알아야 한다.
 3. 따라서 코드의 변경이 이루어지지 않고, 각각 구성 요소들이 인터페이스에만 의존하므로 OCP와 DIP 모두를 만족한다.
+
+<br/>
+
+### 다섯번째 문제(Spring Framework 적용)
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public MemberService memberService() {
+        return new MemberServiceImpl(memberRepository());
+    }
+
+    @Bean
+    public MemberRepository memberRepository() {
+        return new MemoryMemberRepository();
+    }
+
+    @Bean
+    public OrderService orderService() {
+        return new OrderServiceImpl(memberRepository(), discountPolicy());
+    }
+
+    @Bean
+    public DiscountPolicy discountPolicy() {
+        // return new FixDiscountPolicy();
+        return new RateDiscountPolicy();
+    }
+}
+```
+1. 다음과 같이 `AppConfig`를 Spring을 활용하여 수정하면 다음과 같다.
+2. 스프링 컨테이너는 `@Configuration`이 붙은 `AppConfig`를 설정 정보로 사용한다.
+3. `@Bean`이라 적힌 메서드를 모두 호출해서 반환된 객체를 스프링 컨테이너에 등록한다. (이들을 `스프링 빈`이라 한다.) 
+4. 스프링 빈은 `@Bean`이 붙은 메서드 명을 스프링 빈의 이름으로 사용한다. (memberService, orderService...) 
+
+#### 클라이언트는 어떻게 변경될까? 
+```java
+public class OrderApp {
+
+    public static void main(String[] args) {
+        ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
+
+        MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
+        OrderService orderService = applicationContext.getBean("orderService", OrderService.class);
+
+        Long memberId = 1L;
+        Member member = new Member(memberId, "memberA", Grade.VIP);
+        memberService.join(member);
+
+        Order order = orderService.createOrder(memberId, "itemA", 10000);
+        
+        System.out.println("order = " + order);
+    }
+}
+```
+1. `ApplicationContext`를 스프링 컨테이너라 한다.
+2. 이제부터는 `스프링 컨테이너`를 통해 객체를 직접 생성하고 DI 한다.
+3. 이전에는 필요한 객체를 `AppConfig`를 사용해서 직접 호출했지만, 이제는 스프링 컨테이너를 통하여 찾아야 한다. 
+4. 스프링 빈은 `applicationContext.getBean()` 메서드를 사용하여 찾을 수 있다.
+5. 기존에는 개발자가 직접 자바 코드로 모든 것을 했다면 이제는 스프링 컨테이너에 객체를 스프링 빈으로 등록하고, 스프링 컨테이너에서 찾아 사용하도록 변경되었다. 
+
