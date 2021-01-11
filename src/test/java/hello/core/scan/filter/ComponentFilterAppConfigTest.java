@@ -24,6 +24,8 @@ public class ComponentFilterAppConfigTest {
         assertThrows(NoSuchBeanDefinitionException.class, () -> ac.getBean("beanB", BeanB.class));
     }
 
+
+    // FilterType.Annotation이 기본값이기에 생략해도 동작함
     @Configuration
     @ComponentScan(
             includeFilters = @Filter(type = FilterType.ANNOTATION, classes = MyIncludeComponent.class),
