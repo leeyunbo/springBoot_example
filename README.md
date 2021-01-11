@@ -47,9 +47,9 @@ public class AppConfig {
 4. `OrderServiceImpl`은 `OrderService` 인터페이스에만 의존하기 때문에 DIP를 만족한다고 할 수 있다. 
 
 #### SRP도 만족할까?
-1. AppConfig로 분리하기 전에 테스트에 활용했던 OrderApp 클라이언트나 MemberApp 클라이언트는 객체를 생성, 실행하는 다양한 책임을 가지고 있었다.
-2. 하지만 AppConfig로 분리하게 되면서, AppConfig 객체 생성의 책임을 담당하고 클라이언트들이 객체 실행의 책임만을 담당하게 되었다.
-3. 따라서 AppConfig로 분리하게 되면서, SRP도 만족하게 되었음을 의미한다.
+1. `AppConfig`로 분리하기 전에 테스트에 활용했던 `OrderApp` 클라이언트나 `MemberApp` 클라이언트는 객체를 생성, 실행하는 다양한 책임을 가지고 있었다.
+2. 하지만 `AppConfig`로 분리하게 되면서, `AppConfig` 객체 생성의 책임을 담당하고 클라이언트들이 객체 실행의 책임만을 담당하게 되었다.
+3. 따라서 `AppConfig`로 분리하게 되면서, SRP도 만족하게 되었음을 의미한다.
 
 <br/>
 
