@@ -1,5 +1,6 @@
 package hello.core;
 
+import hello.core.discount.DiscountPolicy;
 import hello.core.member.Grade;
 import hello.core.member.Member;
 import hello.core.member.MemberService;
@@ -11,11 +12,7 @@ import org.springframework.context.annotation.AnnotationConfigApplicationContext
  *  MemberService 기능 테스트를 위한 클라이언트
  */
 public class MemberApp {
-    //psvm + tab
     public static void main(String[] args) {
-        //AppConfig appConfig = new AppConfig();
-        //MemberService memberService = appConfig.memberService();
-
         ApplicationContext applicationContext = new AnnotationConfigApplicationContext(AppConfig.class);
         MemberService memberService = applicationContext.getBean("memberService", MemberService.class);
 
@@ -24,7 +21,6 @@ public class MemberApp {
 
         Member findMember = memberService.findMember(1L);
 
-        //soutv + tab
         System.out.println("new member = " + findMember.getName());
         System.out.println("find Member = " + member.getName());
 

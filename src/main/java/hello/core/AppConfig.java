@@ -39,7 +39,6 @@ public class AppConfig {
     // 역할을 잘 분리함으로써 쉽게 변경이 가능함(할인 정책이 바뀌는 경우).. 눈에 쉽게 들어옴
     @Bean
     public DiscountPolicy discountPolicy() {
-        // return new FixDiscountPolicy();
         return new RateDiscountPolicy();
     }
 }
