@@ -2,6 +2,7 @@ package hello.core.scope;
 
 import org.assertj.core.api.Assertions;
 import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.AnnotationConfigApplicationContext;
 import org.springframework.context.annotation.Scope;
 
@@ -22,8 +23,11 @@ public class PrototypeTest {
         System.out.println("prototypeBean2 = " + prototypeBean2);
         Assertions.assertThat(prototypeBean1).isNotSameAs(prototypeBean2);
 
-        // destroy가 호출이 안됨!
+        // destroy가 호출이 안됨! 수동으로 destroy를 호출해줘야함
         ac.close();
+
+        prototypeBean1.destroy();
+        prototypeBean2.destroy();
     }
 
     @Scope("prototype")
