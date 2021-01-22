@@ -10,6 +10,7 @@ import org.springframework.context.annotation.Scope;
 
 import javax.annotation.PostConstruct;
 import javax.annotation.PreDestroy;
+import javax.inject.Provider;
 
 public class SingletonWithPrototypeTest1 {
 
@@ -46,14 +47,21 @@ public class SingletonWithPrototypeTest1 {
     // 클라이언트A, 클라이언트B가 있다면 내부에 있는 prototypeBean은 다른놈들임
     static class ClientBean {
 
+
+
+
         @Autowired
-        //ObjectProvider가 ObjectFactory의 자식이다.
+        //ObjectProvider가 ObjectFactory의 자식이다. Spring이 제공한다. 따라서 Spring에 의존적이다.
         //Dependency Lookup (DL)
         //private ObjectProvider <PrototypeBean> prototypeBeanProvider;
-        private ObjectFactory<PrototypeBean> prototypeBeanProvider;
+        //private ObjectFactory<PrototypeBean> prototypeBeanProvider;
+
+
+        //Spring이 아닌 자바 표준 라이브러리라, 그래들에 추가해줘야한다.
+        private Provider<PrototypeBean> prototypeBeanProvider;
 
         public int logic() {
-            PrototypeBean prototypeBean = prototypeBeanProvider.getObject();
+            PrototypeBean prototypeBean = prototypeBeanProvider.get();
             prototypeBean.addCount();
             int count = prototypeBean.getCount();
             return count;
@@ -73,6 +81,7 @@ public class SingletonWithPrototypeTest1 {
             return count;
         }
 
+        // 얘네는 자바 표준이지만, 기능이 너무 좋아서 스프링에서도 권장함
         @PostConstruct
         public void init() {
             System.out.println("PrototypeBean.init " + this);
