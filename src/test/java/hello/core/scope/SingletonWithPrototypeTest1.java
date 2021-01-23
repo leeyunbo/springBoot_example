@@ -46,16 +46,11 @@ public class SingletonWithPrototypeTest1 {
     // 싱글톤이니까, 한번 주입된 이후에 절대 안바뀌지 왜냐? ClientBean이 하나뿐이니까 계속 함께 유지됨
     // 클라이언트A, 클라이언트B가 있다면 내부에 있는 prototypeBean은 다른놈들임
     static class ClientBean {
-
-
-
-
         @Autowired
         //ObjectProvider가 ObjectFactory의 자식이다. Spring이 제공한다. 따라서 Spring에 의존적이다.
         //Dependency Lookup (DL)
         //private ObjectProvider <PrototypeBean> prototypeBeanProvider;
         //private ObjectFactory<PrototypeBean> prototypeBeanProvider;
-
 
         //Spring이 아닌 자바 표준 라이브러리라, 그래들에 추가해줘야한다.
         private Provider<PrototypeBean> prototypeBeanProvider;
